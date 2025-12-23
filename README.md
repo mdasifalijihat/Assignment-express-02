@@ -4,7 +4,7 @@
 This is a **MERN-ready backend API** for a Vehicle Rental System.  
 It allows you to manage **Vehicles, Users, and Bookings** with **JWT-based authentication** and **role-based access control** (Admin / Customer).  
 
-💡 Built with **Node.js + TypeScript + Express + PostgreSQL**, following **modular & production-ready architecture**.
+💡 Built with **Node.js + TypeScript + Express + PostgreSQL**, following a **modular & production-ready architecture**.
 
 ---
 
@@ -23,10 +23,8 @@ It allows you to manage **Vehicles, Users, and Bookings** with **JWT-based authe
 
 ---
 
-## 💻 Installation Steps
-
-1. Clone the repository:
-
+## 💻 Installation & Setup
+1. **Clone the repository:**
 ```bash
 git clone <repo-url>
 cd vehicle-rental-backend
@@ -35,7 +33,7 @@ Install dependencies:
 bash
 Copy code
 npm install
-Create a .env file in the root directory:
+Create .env file:
 
 ini
 Copy code
@@ -47,39 +45,9 @@ Setup PostgreSQL database:
 
 sql
 Copy code
--- Create database
+
 CREATE DATABASE vehicle_rental;
-
--- Create users table
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  email VARCHAR(100) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL,
-  phone VARCHAR(20) NOT NULL,
-  role VARCHAR(20) NOT NULL DEFAULT 'customer'
-);
-
--- Create vehicles table
-CREATE TABLE vehicles (
-  id SERIAL PRIMARY KEY,
-  vehicle_name VARCHAR(100) NOT NULL,
-  type VARCHAR(20) NOT NULL,
-  registration_number VARCHAR(50) UNIQUE NOT NULL,
-  daily_rent_price NUMERIC(10,2) NOT NULL,
-  availability_status VARCHAR(20) NOT NULL DEFAULT 'available'
-);
-
--- Create bookings table
-CREATE TABLE bookings (
-  id SERIAL PRIMARY KEY,
-  customer_id INTEGER REFERENCES users(id),
-  vehicle_id INTEGER REFERENCES vehicles(id),
-  rent_start_date DATE NOT NULL,
-  rent_end_date DATE NOT NULL,
-  total_price NUMERIC(10,2) NOT NULL,
-  status VARCHAR(20) NOT NULL DEFAULT 'active'
-);
+-- Users, Vehicles, Bookings tables
 Start server:
 
 bash
@@ -92,22 +60,17 @@ pgsql
 Copy code
 vehicle-rental-backend/
 ├─ src/
-│  ├─ config/             # Environment & config
-│  │   └─ index.ts
-│  ├─ db/                 # Database connection
-│  │   └─ index.ts
-│  ├─ middlewares/        # Auth, role, error handling
-│  │   ├─ auth.middleware.ts
-│  │   ├─ role.middleware.ts
-│  │   └─ error.middleware.ts
-│  ├─ modules/            # Feature-based modules
+│  ├─ config/             
+│  ├─ db/                 
+│  ├─ middlewares/        
+│  ├─ modules/            
 │  │   ├─ auth/
 │  │   ├─ users/
 │  │   ├─ vehicles/
 │  │   └─ bookings/
-│  ├─ app.ts              # Express app setup
-│  └─ server.ts           # Server startup
-├─ .env                   # Environment variables
+│  ├─ app.ts              
+│  └─ server.ts           
+├─ .env                   
 ├─ package.json
 ├─ tsconfig.json
 └─ README.md
@@ -122,7 +85,7 @@ Password hashing using bcrypt
 
 Protected routes require Authorization: Bearer <token>
 
-🌐 API Endpoints (Summary)
+🌐 API Endpoints
 Auth
 Method	Endpoint	Access	Description
 POST	/api/v1/auth/signup	Public	Register new user
@@ -175,45 +138,14 @@ Copy code
     "phone": "017XXXXXXXX",
     "role": "customer"
   }
-}
-Login
-http
-Copy code
-POST /api/v1/auth/signin
-Content-Type: application/json
 
-{
-  "email": "asif@example.com",
-  "password": "123456"
-}
-Response:
-
-json
-Copy code
-{
-  "success": true,
-  "data": {
-    "token": "<JWT_TOKEN>",
-    "user": {
-      "id": 1,
-      "name": "Asif Ali",
-      "email": "asif@example.com",
-      "role": "customer"
-    }
-  }
-}
-Protected Route Example (Vehicles)
-http
-Copy code
-GET /api/v1/vehicles
-Authorization: Bearer <JWT_TOKEN>
 ⚡ Tips & Notes
-Always protect sensitive routes with auth + role middleware
+Protect sensitive routes with auth + role middleware
 
 Use transactions for bookings to prevent data corruption
 
 Keep JWT_SECRET safe in production
 
-Use lowercase emails for consistency
+Validate dates & prices
 
-Validate dates & prices to avoid errors
+Use lowercase emails consistently
