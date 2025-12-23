@@ -20,7 +20,7 @@ app.use("/vehicles", vehiclesRouter);
 app.use("/users", usersRouter);
 
 // booking routers
-app.use("/booking", bookingRouter);
+app.use("/bookings", bookingRouter);
 
 // auth routers
 app.use("/auth", authRouter);
