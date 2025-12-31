@@ -14,6 +14,10 @@ class AuthService {
   static async signup(payload: SignupPayload) {
     const { name, email, password, phone, role = "customer" } = payload;
 
+    if (!name || !email || !password || !phone) {
+      throw new Error("All fields are required");
+    }
+
     // Check existing user
     const existingUser = await pool.query(
       `SELECT id FROM users WHERE email = $1`,
