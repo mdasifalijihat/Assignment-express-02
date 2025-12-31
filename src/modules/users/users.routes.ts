@@ -4,10 +4,10 @@ import UserController from "./users.controller";
 
 const router = Router();
 
-router.use(authMiddleware);
+// router.use(authMiddleware);
 
-router.get("/", UserController.getAllUsers);
-router.put("/:userId", UserController.updateUser);
-router.delete("/:userId", UserController.deleteUser);
+router.get("/", authMiddleware, UserController.getAllUsers);
+router.put("/:userId", authMiddleware, UserController.updateUser);
+router.delete("/:userId", authMiddleware, UserController.deleteUser);
 
 export const usersRouter = router;

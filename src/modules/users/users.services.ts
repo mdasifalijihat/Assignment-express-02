@@ -7,11 +7,25 @@ export interface UpdateUserPayload {
 }
 
 class UserService {
-  static async getAllUsers() {
-    const result = await pool.query(
-      `SELECT id, name, email, phone, role, created_at FROM users`
-    );
-    return result.rows;
+   static async getAllUsers(page = 1, limit = 10) {
+    try {
+      const offset = (page - 1) * limit;
+
+      const result = await pool.query(
+        `
+      SELECT id, name, email, phone, role, created_at
+      FROM users
+      WHERE is_deleted = false
+      ORDER BY created_at DESC
+      LIMIT $1 OFFSET $2
+      `,
+        [limit, offset]
+      );
+
+      return result.rows;
+    } catch (error) {
+      throw new Error("Failed to fetch users");
+    }
   }
 
   static async getUserById(userId: number) {

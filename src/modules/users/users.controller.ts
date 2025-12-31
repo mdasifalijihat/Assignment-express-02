@@ -10,25 +10,37 @@ interface AuthRequest extends Request {
 
 class UserController {
   static async getAllUsers(req: AuthRequest, res: Response) {
-    if (req.user?.role !== "admin") {
-      return res.status(403).json({
+    try {
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ success: false, message: "Forbidden" });
+      }
+
+      const users = await UserService.getAllUsers();
+      res.json({ success: true, data: users });
+    } catch {
+      res.status(500).json({
         success: false,
-        message: "Forbidden",
+        message: "Failed to fetch users",
+      });
+    }
+  }
+
+
+  static async updateUser(req: AuthRequest, res: Response) {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const targetUserId = Number(req.params.userId);
+    if (isNaN(targetUserId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID",
       });
     }
 
-    const users = await UserService.getAllUsers();
-    res.json({
-      success: true,
-      data: users,
-    });
-  }
+    const loggedInUser = req.user;
 
-  static async updateUser(req: AuthRequest, res: Response) {
-    const targetUserId = Number(req.params.userId);
-    const loggedInUser = req.user!;
-
-    // Customer can update only own profile
     if (
       loggedInUser.role === "customer" &&
       loggedInUser.userId !== targetUserId
@@ -39,7 +51,7 @@ class UserController {
       });
     }
 
-    // Customer cannot update role
+
     if (loggedInUser.role === "customer" && "role" in req.body) {
       return res.status(403).json({
         success: false,
@@ -57,10 +69,7 @@ class UserController {
         });
       }
 
-      res.json({
-        success: true,
-        data: user,
-      });
+      res.json({ success: true, data: user });
     } catch (error: any) {
       res.status(400).json({
         success: false,
@@ -70,14 +79,12 @@ class UserController {
   }
 
   static async deleteUser(req: AuthRequest, res: Response) {
-    if (req.user?.role !== "admin") {
-      return res.status(403).json({
-        success: false,
-        message: "Forbidden",
-      });
-    }
-
     try {
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ success: false, message: "Forbidden" });
+      }
+
+      
       await UserService.deleteUser(Number(req.params.userId));
       res.json({
         success: true,
